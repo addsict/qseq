@@ -23,19 +23,8 @@ import (
     // return s
 // }
 
-func GetNextSequence() uint64 {
-    // f, err := os.Create("profile")
-    // if err != nil {
-        // log.Fatal(err)
-    // }
-    // pprof.StartCPUProfile(f)
-
-    fh, err := os.OpenFile("seq_foo", os.O_RDWR, 0666)
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer fh.Close()
-
+func GetNextSequence(fh *os.File) uint64 {
+    fh.Seek(0, 0)
     reader := bufio.NewReader(fh)
     line, err := reader.ReadString('\n')
     if err != nil && err != io.EOF {
@@ -58,8 +47,6 @@ func GetNextSequence() uint64 {
     }
     writer.Flush()
 
-    // pprof.StopCPUProfile()
-
     return nextSeq
 }
 
@@ -69,9 +56,15 @@ func main() {
     responseChan := make(chan uint64, 100)
 
     go func() {
+        fh, err := os.OpenFile("seq_foo", os.O_RDWR, 0666)
+        if err != nil {
+            log.Fatal(err)
+        }
+        defer fh.Close()
+
         for ;; {
             <-requestChan
-            responseChan <- GetNextSequence()
+            responseChan <- GetNextSequence(fh)
         }
     }()
 
