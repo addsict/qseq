@@ -4,11 +4,11 @@ import (
     "fmt"
     "net/http"
     "os"
-    "bufio"
+    // "bufio"
     "strconv"
     "log"
     "io"
-    "strings"
+    // "strings"
     // "runtime/pprof"
 )
 
@@ -24,28 +24,26 @@ import (
 // }
 
 func GetNextSequence(fh *os.File) uint64 {
+    b := make([]byte, 32)
+
     fh.Seek(0, 0)
-    reader := bufio.NewReader(fh)
-    line, err := reader.ReadString('\n')
+    n, err := fh.Read(b)
     if err != nil && err != io.EOF {
         log.Fatal(err)
     }
 
-    seq, err := strconv.ParseUint(strings.Trim(line, "\n"), 10, 64)
+    seq, err := strconv.ParseUint(string(b[:n]), 10, 64)
     if err != nil {
         log.Fatal(err)
     }
 
     nextSeq := seq + 1
 
-    fh.Truncate(0)
     fh.Seek(0, 0)
-    writer := bufio.NewWriter(fh)
-    _, err = writer.WriteString(fmt.Sprintf("%d\n", nextSeq))
+    _, err = fh.WriteString(fmt.Sprintf("%d", nextSeq))
     if err != nil {
         log.Fatal(err)
     }
-    writer.Flush()
 
     return nextSeq
 }
