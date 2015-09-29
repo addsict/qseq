@@ -1,5 +1,6 @@
 qseq
 ===
+(under development)
 qseq is a simple and fast sequence number generator with RESTful HTTP API
 
 
@@ -8,16 +9,30 @@ qseq is a simple and fast sequence number generator with RESTful HTTP API
 ## Create new sequence
 
 ```
-PUT /sequence/foo
+PUT /sequences/foo
 ```
 
-## Get sequence 
+## Get next sequence value
 
 ```
-GET /sequence/foo/next
+GET /sequences/foo
 ```
 
-# Server Settings
+## Update sequence value
 
-- datadir
-- port
+```
+PUT /sequences/foo
+body: 1000
+```
+
+## Delete sequence
+
+```
+DELETE /sequences/foo
+```
+
+## List sequences
+
+```
+GET /sequences
+```
