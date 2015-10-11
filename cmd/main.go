@@ -15,7 +15,9 @@ func main() {
     g, _ := qseq.NewGenerator()
     go g.Run()
 
-    d, _ := qseq.NewDispatcher(g)
+    h, _ := qseq.NewHandler(g)
+
+    d, _ := qseq.NewDispatcher(h)
     d.Run()
 
     // http.HandleFunc("/sequence", func(w http.ResponseWriter, r *http.Request) {

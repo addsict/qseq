@@ -9,12 +9,17 @@ import (
 )
 
 type Dispatcher struct {
-    generator *Generator
+    handler *Handler
+    routing map[string]*regexp.Regexp
 }
 
-func NewDispatcher(g *Generator) (*Dispatcher, error) {
+func NewDispatcher(h *Handler) (*Dispatcher, error) {
+    routing := map[string]*regexp.Regexp {
+        "get": regexp.MustCompile("^/sequences/([^/]+)$"),
+    }
     return &Dispatcher{
-        generator: g,
+        handler: h,
+        routing: routing,
     }, nil;
 }
 
@@ -29,11 +34,14 @@ func (d *Dispatcher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *Dispatcher) HandleGet(w http.ResponseWriter, r *http.Request) {
-    rgx := regexp.MustCompile("^/sequences/([^/]+)$")
-    matched := rgx.FindStringSubmatch(r.RequestURI)
+    matched := d.routing["get"].FindStringSubmatch(r.RequestURI)
     if len(matched) > 1 {
-        d.generator.ReqChan <- matched[1]
-        nextSeq := <-d.generator.ResChan
+        // incr := r.FormValue("increment")
+        nextSeq, err := d.handler.HandleGetSequence(matched[1], 1)
+        if err != nil {
+            http.Error(w, err.Error(), 404)
+            return
+        }
         fmt.Fprintf(w, strconv.FormatUint(nextSeq, 10))
         return
     }
