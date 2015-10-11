@@ -5,33 +5,40 @@ import (
     "fmt"
     // "log"
     "regexp"
+    "strconv"
 )
 
 type Dispatcher struct {
+    generator *Generator
 }
 
-func NewDispatcher() (*Dispatcher, error) {
-
+func NewDispatcher(g *Generator) (*Dispatcher, error) {
     return &Dispatcher{
+        generator: g,
     }, nil;
 }
 
 func (d *Dispatcher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     switch r.Method {
     case "GET":
-        // r.URL
-        rgx := regexp.MustCompile("^/sequences/([^/]+)$") // あくまでも GET /sequences{/id} にmatchするかどうかをチェックする
-        matched := rgx.FindStringSubmatch(r.RequestURI)
-        if len(matched) > 1 {
-            fmt.Fprintf(w, matched[1])
-        } else {
-            fmt.Fprintf(w, "hello")
-        }
-        // log.Println(r.RequestURI)
+        d.HandleGet(w, r)
     
     default:
         http.Error(w, "Method Not Allowed", 405)
     }
+}
+
+func (d *Dispatcher) HandleGet(w http.ResponseWriter, r *http.Request) {
+    rgx := regexp.MustCompile("^/sequences/([^/]+)$")
+    matched := rgx.FindStringSubmatch(r.RequestURI)
+    if len(matched) > 1 {
+        d.generator.ReqChan <- matched[1]
+        nextSeq := <-d.generator.ResChan
+        fmt.Fprintf(w, strconv.FormatUint(nextSeq, 10))
+        return
+    }
+
+    http.Error(w, "Not Found", 404)
 }
 
 func (d *Dispatcher) Run() {
