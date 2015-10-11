@@ -12,10 +12,7 @@ import (
 )
 
 func main() {
-    g, _ := qseq.NewGenerator()
-    go g.Run()
-
-    h, _ := qseq.NewHandler(g)
+    h, _ := qseq.NewHandler()
 
     d, _ := qseq.NewDispatcher(h)
     d.Run()

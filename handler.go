@@ -10,11 +10,14 @@ type Handler struct {
     generator *Generator
 }
 
-func NewHandler(g *Generator) (*Handler, error) {
+func NewHandler() (*Handler, error) {
+    g, _ := NewGenerator()
+    go g.Run()
+
     return &Handler {
         seqFiles: map[string]*os.File{},
         generator: g,
-    }, nil;
+    }, nil
 }
 
 func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
@@ -33,4 +36,21 @@ func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
     h.generator.ReqChan <- fh
     seq := <-h.generator.ResChan
     return seq, nil
+}
+
+func (h *Handler) PutSequence(key string, value uint64) (uint64, error) {
+    fh, err := os.Create(key)
+    if err != nil {
+        return 0, err
+    }
+
+    _, err = fh.WriteString(fmt.Sprintf("%d", value))
+    if err != nil {
+        return 0, err
+    }
+
+    // keep fh to serve later request
+    h.seqFiles[key] = fh
+
+    return value, nil
 }
