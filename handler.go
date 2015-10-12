@@ -67,6 +67,19 @@ func (h *Handler) PutSequence(key string, value uint64) (uint64, error) {
     return value, nil
 }
 
+func (h *Handler) DeleteSequence(key string) error {
+    absPath := h.getAbsPath(key)
+    log.Printf("remove file: %s\n", absPath)
+    err := os.Remove(absPath)
+    if err != nil {
+        return err
+    }
+
+    delete(h.seqFiles, key)
+
+    return nil
+}
+
 func (h *Handler) getAbsPath(path string) string {
     absdir, _ := filepath.Abs(h.datadir)
     return filepath.Join(absdir, path)

@@ -18,6 +18,7 @@ func NewDispatcher(h *Handler) (*Dispatcher, error) {
     routing := map[string]*regexp.Regexp {
         "get": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
         "put": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
+        "delete": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
     }
     return &Dispatcher{
         handler: h,
@@ -32,6 +33,9 @@ func (d *Dispatcher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
     case "PUT":
         d.HandlePut(w, r)
+
+    case "DELETE":
+        d.HandleDelete(w, r)
     
     default:
         http.Error(w, "Method Not Allowed", 405)
@@ -77,6 +81,21 @@ func (d *Dispatcher) HandlePut(w http.ResponseWriter, r *http.Request) {
             return
         }
         fmt.Fprintf(w, strconv.FormatUint(seq, 10))
+        return
+    }
+
+    http.Error(w, "Invalid Parameter", 400)
+}
+
+func (d *Dispatcher) HandleDelete(w http.ResponseWriter, r *http.Request) {
+    matched := d.routing["delete"].FindStringSubmatch(r.RequestURI)
+    if len(matched) > 1 {
+        err := d.handler.DeleteSequence(matched[1])
+        if err != nil {
+            http.Error(w, err.Error(), 400)
+            return
+        }
+        w.WriteHeader(204)
         return
     }
 
