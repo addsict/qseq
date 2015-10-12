@@ -21,7 +21,7 @@ func main() {
     log.Printf("data directory: %s\n", *datadir)
     log.Printf("port number: %d\n", *port)
 
-    h, _ := qseq.NewHandler()
+    h, _ := qseq.NewHandler(*datadir)
 
     d, _ := qseq.NewDispatcher(h)
     d.Run(*port)

@@ -61,10 +61,14 @@ func (d *Dispatcher) HandlePut(w http.ResponseWriter, r *http.Request) {
         buf.ReadFrom(r.Body)
         valStr := buf.String()
 
-        value, err := strconv.ParseUint(valStr, 10, 64)
-        if err != nil {
-            http.Error(w, err.Error(), 400)
-            return
+        var value uint64 = 0
+        var err error
+        if valStr != "" {
+            value, err = strconv.ParseUint(valStr, 10, 64)
+            if err != nil {
+                http.Error(w, err.Error(), 400)
+                return
+            }
         }
 
         seq, err := d.handler.PutSequence(matched[1], value)
