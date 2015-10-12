@@ -8,14 +8,23 @@ import (
     // "io"
     // "strings"
     // "runtime/pprof"
+    "log"
+    "flag"
     "github.com/addsict/qseq"
 )
 
 func main() {
+    datadir := flag.String("datadir", "/tmp", "data directory")
+    port    := flag.Int("port", 8080, "port number")
+    flag.Parse()
+
+    log.Printf("data directory: %s\n", *datadir)
+    log.Printf("port number: %d\n", *port)
+
     h, _ := qseq.NewHandler()
 
     d, _ := qseq.NewDispatcher(h)
-    d.Run()
+    d.Run(*port)
 
     // http.HandleFunc("/sequence", func(w http.ResponseWriter, r *http.Request) {
         // g.ReqChan <- 1

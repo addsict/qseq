@@ -38,6 +38,9 @@ func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
     return seq, nil
 }
 
+// func (h *Handler) GetAllSequences() ([]string, error) {
+// }
+
 func (h *Handler) PutSequence(key string, value uint64) (uint64, error) {
     fh, err := os.Create(key)
     if err != nil {

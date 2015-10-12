@@ -3,7 +3,7 @@ package qseq
 import (
     "net/http"
     "fmt"
-    // "log"
+    "log"
     "regexp"
     "strconv"
     "bytes"
@@ -16,8 +16,8 @@ type Dispatcher struct {
 
 func NewDispatcher(h *Handler) (*Dispatcher, error) {
     routing := map[string]*regexp.Regexp {
-        "get": regexp.MustCompile("^/sequences/([^/]+)$"),
-        "put": regexp.MustCompile("^/sequences/([^/]+)$"),
+        "get": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
+        "put": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
     }
     return &Dispatcher{
         handler: h,
@@ -79,11 +79,11 @@ func (d *Dispatcher) HandlePut(w http.ResponseWriter, r *http.Request) {
     http.Error(w, "Invalid Parameter", 400)
 }
 
-func (d *Dispatcher) Run() {
+func (d *Dispatcher) Run(port int) {
     s := &http.Server{
-        Addr: ":9000",
+        Addr: fmt.Sprintf(":%d", port),
         Handler: d,
     }
 
-    s.ListenAndServe()
+    log.Fatal(s.ListenAndServe())
 }
