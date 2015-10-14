@@ -8,22 +8,22 @@ import (
 	"strconv"
 )
 
-type Generator struct {
+type Sequencer struct {
 	ReqChan chan *os.File
 	ResChan chan uint64
 }
 
-func NewGenerator() (*Generator, error) {
-	return &Generator{
+func NewSequencer() (*Sequencer, error) {
+	return &Sequencer{
 		ReqChan: make(chan *os.File, 100),
 		ResChan: make(chan uint64, 100),
 	}, nil
 }
 
-func (g *Generator) Run() {
+func (s *Sequencer) Run() {
 	for {
-		fh := <-g.ReqChan
-		g.ResChan <- GetNextSequence(fh)
+		fh := <-s.ReqChan
+		s.ResChan <- GetNextSequence(fh)
 	}
 }
 

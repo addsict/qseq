@@ -10,21 +10,21 @@ import (
 type Handler struct {
 	datadir   string
 	seqFiles  map[string]*os.File
-	generator *Generator
+	sequencer *Sequencer
 }
 
 func NewHandler(datadir string) (*Handler, error) {
-	g, _ := NewGenerator()
-	go g.Run()
+	s, _ := NewSequencer()
+	go s.Run()
 
 	return &Handler{
 		datadir:   datadir,
 		seqFiles:  map[string]*os.File{},
-		generator: g,
+		sequencer: s,
 	}, nil
 }
 
-func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
+func (h *Handler) GetSequence(key string, incr uint32) (uint64, error) {
 	fh := h.seqFiles[key]
 	if fh == nil {
 		var err error
@@ -39,8 +39,8 @@ func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
 		h.seqFiles[key] = fh
 	}
 
-	h.generator.ReqChan <- fh
-	seq := <-h.generator.ResChan
+	h.sequencer.ReqChan <- fh
+	seq := <-h.sequencer.ResChan
 	return seq, nil
 }
 

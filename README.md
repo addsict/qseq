@@ -10,27 +10,26 @@ $ qseq --datadir=. --port=9000
 
 # RESTful API
 
-## Create new sequence
+## Create a new sequence
 
-```
-PUT /sequences/foo
-```
-
-## Get next sequence value
-
-```
-GET /sequences/foo
+```bash
+$ curl -X PUT http://127.0.0.1:8080/sequences/foo
 ```
 
-## Update sequence value
+## Get the next sequence value
 
-```
-PUT /sequences/foo
-body: 1000
+```bash
+$ curl http://127.0.0.1:8080/sequences/foo
 ```
 
-## Delete sequence
+## Update the sequence value
 
+```bash
+$ curl -X PUT -d 100 http://127.0.0.1:8080/sequences/foo
 ```
-DELETE /sequences/foo
+
+## Delete the sequence
+
+```bash
+$ curl -X DELETE http://127.0.0.1:8080/sequences/foo
 ```

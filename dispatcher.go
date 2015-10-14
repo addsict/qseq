@@ -46,7 +46,7 @@ func (d *Dispatcher) HandleGet(w http.ResponseWriter, r *http.Request) {
 	matched := d.routing["get"].FindStringSubmatch(r.RequestURI)
 	if len(matched) > 1 {
 		// incr := r.FormValue("increment")
-		nextSeq, err := d.handler.HandleGetSequence(matched[1], 1)
+		nextSeq, err := d.handler.GetSequence(matched[1], 1)
 		if err != nil {
 			http.Error(w, err.Error(), 404)
 			return
