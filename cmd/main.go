@@ -1,20 +1,20 @@
 package main
 
 import (
-    // "fmt"
-    // "net/http"
-    // "bufio"
-    // "strconv"
-    // "io"
-    // "strings"
-    // "runtime/pprof"
     "log"
     "flag"
     "github.com/addsict/qseq"
+	"io/ioutil"
 )
 
 func main() {
-    datadir := flag.String("datadir", "/tmp", "data directory")
+	tmpdir, err := ioutil.TempDir("", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// command line options
+    datadir := flag.String("datadir", tmpdir, "data directory")
     port    := flag.Int("port", 8080, "port number")
     flag.Parse()
 
@@ -25,12 +25,4 @@ func main() {
 
     d, _ := qseq.NewDispatcher(h)
     d.Run(*port)
-
-    // http.HandleFunc("/sequence", func(w http.ResponseWriter, r *http.Request) {
-        // g.ReqChan <- 1
-        // nextSeq := <-g.ResChan
-        // fmt.Fprintf(w, strconv.FormatUint(nextSeq, 10))
-    // })
-
-    // http.ListenAndServe(":9000", nil)
 }

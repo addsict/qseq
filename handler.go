@@ -29,7 +29,7 @@ func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
     if fh == nil {
         var err error
         abspath := h.getAbsPath(key)
-        log.Printf("open file: %s\n", abspath)
+        log.Printf("open the file: %s\n", abspath)
         fh, err = os.OpenFile(abspath, os.O_RDWR, 0666)
         if err != nil {
             return 0, fmt.Errorf("sequence %s not found", key)
@@ -44,12 +44,9 @@ func (h *Handler) HandleGetSequence(key string, incr uint32) (uint64, error) {
     return seq, nil
 }
 
-// func (h *Handler) GetAllSequences() ([]string, error) {
-// }
-
 func (h *Handler) PutSequence(key string, value uint64) (uint64, error) {
     absPath := h.getAbsPath(key)
-    log.Printf("create file: %s\n", absPath)
+    log.Printf("create a file: %s\n", absPath)
 
     fh, err := os.Create(absPath)
     if err != nil {
@@ -69,7 +66,7 @@ func (h *Handler) PutSequence(key string, value uint64) (uint64, error) {
 
 func (h *Handler) DeleteSequence(key string) error {
     absPath := h.getAbsPath(key)
-    log.Printf("remove file: %s\n", absPath)
+    log.Printf("remove the file: %s\n", absPath)
     err := os.Remove(absPath)
     if err != nil {
         return err
