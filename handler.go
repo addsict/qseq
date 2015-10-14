@@ -24,7 +24,7 @@ func NewHandler(datadir string) (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) GetSequence(key string, incr uint32) (uint64, error) {
+func (h *Handler) GetSequence(key string, incr uint64) (uint64, error) {
 	fh := h.seqFiles[key]
 	if fh == nil {
 		var err error
@@ -34,13 +34,19 @@ func (h *Handler) GetSequence(key string, incr uint32) (uint64, error) {
 		if err != nil {
 			return 0, fmt.Errorf("sequence %s not found", key)
 		}
-		// defer fh.Close()
 
+		// keep fh to serve later request
 		h.seqFiles[key] = fh
 	}
 
-	h.sequencer.ReqChan <- fh
+	seqReq := &SequenceRequest{
+		fh: fh,
+		incr: incr,
+	}
+	h.sequencer.ReqChan <- seqReq
+
 	seq := <-h.sequencer.ResChan
+
 	return seq, nil
 }
 

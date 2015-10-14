@@ -16,9 +16,9 @@ type Dispatcher struct {
 
 func NewDispatcher(h *Handler) (*Dispatcher, error) {
 	routing := map[string]*regexp.Regexp{
-		"get":    regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
-		"put":    regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
-		"delete": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)$`),
+		"get":    regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)`),
+		"put":    regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)`),
+		"delete": regexp.MustCompile(`^/sequences/([0-9a-zA-Z]+)`),
 	}
 	return &Dispatcher{
 		handler: h,
@@ -45,8 +45,17 @@ func (d *Dispatcher) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (d *Dispatcher) HandleGet(w http.ResponseWriter, r *http.Request) {
 	matched := d.routing["get"].FindStringSubmatch(r.RequestURI)
 	if len(matched) > 1 {
-		// incr := r.FormValue("increment")
-		nextSeq, err := d.handler.GetSequence(matched[1], 1)
+		incrStr := r.FormValue("increment")
+		var incr uint64 = 1
+		var err error
+		if incrStr != "" {
+			incr, err = strconv.ParseUint(incrStr, 10, 64)
+			if err != nil {
+				http.Error(w, "invalid parameter", 400)
+				return
+			}
+		}
+		nextSeq, err := d.handler.GetSequence(matched[1], incr)
 		if err != nil {
 			http.Error(w, err.Error(), 404)
 			return

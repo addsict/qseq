@@ -8,26 +8,31 @@ import (
 	"strconv"
 )
 
+type SequenceRequest struct {
+	fh *os.File
+	incr uint64
+}
+
 type Sequencer struct {
-	ReqChan chan *os.File
+	ReqChan chan *SequenceRequest
 	ResChan chan uint64
 }
 
 func NewSequencer() (*Sequencer, error) {
 	return &Sequencer{
-		ReqChan: make(chan *os.File, 100),
+		ReqChan: make(chan *SequenceRequest, 100),
 		ResChan: make(chan uint64, 100),
 	}, nil
 }
 
 func (s *Sequencer) Run() {
 	for {
-		fh := <-s.ReqChan
-		s.ResChan <- GetNextSequence(fh)
+		req := <-s.ReqChan
+		s.ResChan <- GetNextSequence(req.fh, req.incr)
 	}
 }
 
-func GetNextSequence(fh *os.File) uint64 {
+func GetNextSequence(fh *os.File, incr uint64) uint64 {
 	b := make([]byte, 32)
 
 	fh.Seek(0, 0)
@@ -41,7 +46,7 @@ func GetNextSequence(fh *os.File) uint64 {
 		log.Fatal(err)
 	}
 
-	nextSeq := seq + 1
+	nextSeq := seq + incr
 
 	fh.Seek(0, 0)
 	_, err = fh.WriteString(fmt.Sprintf("%d", nextSeq))

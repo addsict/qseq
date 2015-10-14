@@ -16,10 +16,17 @@ $ qseq --datadir=. --port=9000
 $ curl -X PUT http://127.0.0.1:8080/sequences/foo
 ```
 
-### Get the next sequence value
+### Get the sequence value
 
 ```bash
+# next value
 $ curl http://127.0.0.1:8080/sequences/foo
+
+# next 10 value
+$ curl http://127.0.0.1:8080/sequences/foo?increment=10
+
+# current value
+$ curl http://127.0.0.1:8080/sequences/foo?increment=0
 ```
 
 ### Update the sequence value
