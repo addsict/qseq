@@ -1,6 +1,8 @@
 qseq
 ===
 
+[![Build Status](https://travis-ci.org/addsict/qseq.svg)](https://travis-ci.org/addsict/qseq)
+
 qseq is a centralized sequence ID generation server.
 It's simple, very fast, and has easy-to-use RESTful APIs.
 

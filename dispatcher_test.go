@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"testing"
 	"fmt"
-	"github.com/addsict/qseq"
 	"github.com/lestrrat/go-tcptest"
 	"time"
 	"net/http"
@@ -17,8 +16,8 @@ func TestServeHTTP(t *testing.T) {
 		t.Fatalf("Failed to create a temporary data directory")
 	}
 
-	h, _ := qseq.NewHandler(tempdir)
-	d, _ := qseq.NewDispatcher(h)
+	h, _ := NewHandler(tempdir)
+	d, _ := NewDispatcher(h)
 
 	server, err := tcptest.Start2(func(tt *tcptest.TCPTest) {
 		port := tt.Port()

@@ -5,7 +5,6 @@ import (
 	"testing"
 	"math"
 	"fmt"
-	"github.com/addsict/qseq"
 )
 
 var nextSeqTests = []struct {
@@ -38,7 +37,7 @@ func TestGetNextSequence(t *testing.T) {
 			t.Fatalf("Failed to write a content to the temporary file")
 		}
 
-		seq := qseq.GetNextSequence(tempfh, s.increment)
+		seq := GetNextSequence(tempfh, s.increment)
 		if seq != s.next {
 			t.Errorf("Next sequence is invalid: expected = %d, got = %d", s.next, seq)
 		}
