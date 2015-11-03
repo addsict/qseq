@@ -15,9 +15,35 @@ One good example is [flicker's ticket server](http://code.flickr.net/2010/02/08/
 
 write it later...
 
+## Architecture
+
+```
+client            server      request handler    sequencer(goroutine)
+   +                +               +                +
+   |    request     |               |                |
+   |--------------->|     spawn     |                |
+   |                |   goroutine   |                |
+   |                |-------------->|      call      |
+   |                |               |   via channel  |
+   |                |               |--------------->|
+   |                |               |                |
+   |                |               |                |--->+
+   |                |               |                |    | file read
+   |                |               |                |    | file write
+   |                |               |                |<---+
+   |                |               |                |
+   |                |               |<---------------|
+   |                |               |     return     |
+   |                |               |    sequence    |
+   |<-------------------------------|                |
+   |    response    |               |                |
+   |                |               |                |
+   +                +               +                +
+```
+
 ## Performance
 
-This sequence server achieved over 60K requests per second on my MacBook Pro (2.3 GHz Core i7).
+This sequence server achieved over 60K requests per second on MacBook Pro (2.3 GHz Core i7).
 
 ```
 $ wrk -c 100 -t 10 -d 10 http://127.0.0.1:9000/sequences/foo
@@ -31,7 +57,15 @@ Requests/sec:  61004.27
 Transfer/sec:      7.09MB
 ```
 
-## Run the server
+## Build/Run the server
+
+### Build
+
+```bash
+$ go build cmd/qseq.go
+```
+
+### Run
 
 ```bash
 $ qseq --datadir=. --port=9000
